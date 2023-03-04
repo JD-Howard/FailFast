@@ -1,0 +1,13 @@
+**/bin/**
+**/obj/**
+/.vs/**
+/.idea/**
+/Temp/**
+/packages/**
+
+*.DotSettings.user
+*.csproj.user
+*.bak
+
+.DS_Store
+desktop.ini

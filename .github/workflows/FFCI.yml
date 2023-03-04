@@ -1,0 +1,38 @@
+name: FastFail Continuous Integration
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, synchronize]
+    paths: ["**.cs", "**.yml", "**.csproj"]
+  workflow_dispatch:
+
+jobs:
+  FF-BUILD-PIPELINE:
+    runs-on: ubuntu-latest
+    env:
+      CSPROJ1: ${{ github.workspace }}\FailFast\FailFast\FailFast.csproj
+      CSPROJ2: ${{ github.workspace }}\FailFast\UnitTests\UnitTests.csproj
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: .\FailFast
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore Dependencies
+        run: |
+          dotnet restore "${{ env.CSPROJ1 }}"
+          dotnet restore "${{ env.CSPROJ2 }}"
+      - name: Build All
+        id: build-all
+        run: |
+          dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Debug
+          dotnet build "${{ env.CSPROJ2 }}" --no-restore --configuration Debug
+          dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Release
+      - name: Test
+        id: run-tests
+        run: |
+          dotnet test "${{ env.CSPROJ2 }}" --logger "console;verbosity=normal" --no-build --no-restore --configuration Debug
+          
