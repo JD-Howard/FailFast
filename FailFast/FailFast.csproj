@@ -13,6 +13,7 @@
         <PackageTags>Defensive;Devleoper;Debug;Breakpoint;Logs</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Version>1.1.0</Version>
     </PropertyGroup>
 
 
@@ -44,12 +45,12 @@
 
     <Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="$(Configuration) == 'Release'">
         <ItemGroup>
-            <PkgNew Include="$(SolutionDir)FailFast\bin\Release\*.nupkg"/>
-            <PkgOld Include="$(SolutionDir)Latest\*.nupkg"/>
+            <PkgNew Include="$(SolutionDir)FailFast\bin\Release\*.nupkg" />
+            <PkgOld Include="$(SolutionDir)Latest\*.nupkg" />
         </ItemGroup>
 
-        <Delete Files="@(PkgOld)"/>
-        <Copy SourceFiles="@(PkgNew)" DestinationFolder="$(SolutionDir)Latest\"/>
+        <Delete Files="@(PkgOld)" />
+        <Copy SourceFiles="@(PkgNew)" DestinationFolder="$(SolutionDir)Latest\" />
     </Target>
 
 </Project>

@@ -11,7 +11,7 @@ public class TestBreakExplicit
     }
     
     
-    private void BreakOff() => SetupConfig.GetMock().CanDebugBreak = false;
+    private void BreakOff() => SetupConfig.GetMock().SetCanDebugBreak(false);
     private void Reset() => SetupConfig.GetMock().LogCount = 0;
     private int LogCount => SetupConfig.GetMock().LogCount;
         

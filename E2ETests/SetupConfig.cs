@@ -11,9 +11,14 @@ public class SetupConfig : IFailFastConfig
     private SetupConfig() { }
     
     public int LogCount { get; set; }
-    public bool CanDebugBreak { get; set; } = true;
 
-    public void FailFastBreak(string caller, Guid? groupId, string routing, IEnumerable? context) => LogCount++;
+    
+    private bool _canBreak = true;
+    public bool GetCanDebugBreak() => _canBreak;
+    public void SetCanDebugBreak(bool authState) => _canBreak = authState;
+
+
+    public void FailFastBreak(string caller, string routing, object? context) => LogCount++;
 
     public void FailFastThrow(string caller, Exception error) => LogCount++;
 }

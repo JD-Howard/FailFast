@@ -9,10 +9,10 @@ public class TestBreakConfig
         // These tests all invoke Debugger.Break() and must be run manually
         FailFast.Initialize(SetupConfig.GetMock());
     }
-    
-    
-    private void BreakOn() => SetupConfig.GetMock().CanDebugBreak = true;
-    private void BreakOff() => SetupConfig.GetMock().CanDebugBreak = false;
+
+
+    private void BreakOn() => SetupConfig.GetMock().SetCanDebugBreak(true);
+    private void BreakOff() => SetupConfig.GetMock().SetCanDebugBreak(false);
     private void Reset() => SetupConfig.GetMock().LogCount = 0;
     private int LogCount => SetupConfig.GetMock().LogCount;
         

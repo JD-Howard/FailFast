@@ -23,7 +23,7 @@ internal readonly struct FailFastOperations : IFailFastOperations
             return false;
         
         if (_context != FailFastContext.ExplicitBreak)
-            FailFast.Config?.FailFastBreak(caller, null, "FailFast.When.Null", new[] {obj});
+            FailFast.Config?.FailFastBreak(caller, "FailFast.When.Null", obj);
         
         if (_context != FailFastContext.NoBreak && Debugger.IsAttached)
             Debugger.Break();
@@ -42,7 +42,7 @@ internal readonly struct FailFastOperations : IFailFastOperations
             return false;
         
         if (_context != FailFastContext.ExplicitBreak)
-            FailFast.Config?.FailFastBreak(caller, null, "FailFast.When.NotNull", new[] {obj});
+            FailFast.Config?.FailFastBreak(caller, "FailFast.When.NotNull", obj);
         
         if (_context != FailFastContext.NoBreak && Debugger.IsAttached)
             Debugger.Break();
@@ -61,7 +61,7 @@ internal readonly struct FailFastOperations : IFailFastOperations
             return false;
         
         if (_context != FailFastContext.ExplicitBreak)
-            FailFast.Config?.FailFastBreak(caller, null, "FailFast.When.True", new[] {test});
+            FailFast.Config?.FailFastBreak(caller, "FailFast.When.True", test);
         
         if (_context != FailFastContext.NoBreak && Debugger.IsAttached)
             Debugger.Break();
@@ -80,7 +80,7 @@ internal readonly struct FailFastOperations : IFailFastOperations
             return false;
         
         if (_context != FailFastContext.ExplicitBreak)
-            FailFast.Config?.FailFastBreak(caller, null, "FailFast.When.NotTrue", new[] {test});
+            FailFast.Config?.FailFastBreak(caller, "FailFast.When.NotTrue", test);
         
         if (_context != FailFastContext.NoBreak && Debugger.IsAttached)
             Debugger.Break();

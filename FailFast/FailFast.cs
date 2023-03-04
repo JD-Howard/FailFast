@@ -41,7 +41,7 @@ public class FailFast
     /// Note: you do not need to configure FF, but this path cannot fire Debugger.Break() without a configuration.
     /// </summary>
     public static IFailFastOperations When 
-        => new FailFastOperations(_instance?._config?.CanDebugBreak == true ? FailFastContext.ConfigBreak : FailFastContext.NoBreak);
+        => new FailFastOperations(Config?.GetCanDebugBreak() == true ? FailFastContext.ConfigBreak : FailFastContext.NoBreak);
 
 
     
