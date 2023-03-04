@@ -24,15 +24,18 @@ In that example, both Core & Framework projects will not flag SomeObj as being n
 ### Configuration
 FailFast can be used on a temporary basis without being configured, but only through use of the `FailFast.BreakWhen` route and those will literally throw errors if the DEBUG flag doesn't exist. So, they are only intended for drilling into what is directly in front of you. If that is all you need, then you'll be deleting all traces of FailFast and can entirely remove the reference from your Release build.
 
-FailFast itself and its Configuration are intended to be singletons. You define what the configuration does by implementing the `IFailFastConfig` interface. Which only cares about 3 things: 
+FailFast itself and its Configuration are intended to be singletons. You define what the configuration does by implementing the `IFailFastConfig` interface. Which only cares about 4 things: 
 
-- bool CanDebugBreak property
-  - The centralized place you can enable/disable whether `Debugger.Break()` will fire.
-  - Your implementation determines whether it can manipulated at runtime. In your debug builds, you may want to allow it to be set dynamically, but your production builds may choose to swallow any effort make it True.
-  - In parallel tasks, this should NOT be dynamically manipulated. Those tasks can be "All In" or "All Out" for allowing `Debugger.Break()` to fire. When fine grain control of async situations are needed, then its probably a good place to temporarily use the `FailFast.BreakWhen` route. 
-- void FailFastBreak()
+- **bool GetCanDebugBreak()**
+  - The centralized boolean that determines if `FastFail.When` statements are enabled/disabled for `Debugger.Break()` execution.
+- **void SetCanDebugBreak(bool authState)**
+  - Your implementation determines whether it can manipulated at runtime.
+    - In RELEASE builds, this should probably just eat whatever value it's given.
+    - In DEBUG builds, it really depends on how your using FailFast, but theoretically should change the value of GetCanDebugBreak().
+  - Parallel Tasks should NOT be dynamically manipulated CanDebuggerBreak. Async Tasks can be "All In" or "All Out" but not partial. When fine grain control of async situations is needed, then its probably a good place to temporarily use the `FailFast.BreakWhen` route.
+- **void FailFastBreak(string caller, string routing, object? context)**
   - Optional logging entry point for FailFast primitive conditions that resolve to true.
-- void FailFastThrows()
+- **void FailFastThrows(string caller, Exception error)**
   - Optional exception logging entry point for the FailFast Throws() methods.
 
 **The IFailFastConfig is specifically intended to work with the `FailFast.When` route and more often than not, that should be the only route used in your code.** 
@@ -73,7 +76,7 @@ public void SomeMethod<T>(T obj) where T : ISomeCollection
 In that example and assuming a config was setup to allow breaking... If any one of those FailFast calls resolves to true, then you should hit a `Debugger.Break()` and gain some insight into what went wrong without losing your debug session. You may need to do 1 Step-In/Out to get back to your code, but that should be it.
 
 
-#### Throws
+#### Throws Example
 FailFast is also equipped to deal with arbitrary code block execution. This won't give you quite the same context your own Try/Catch would, but its pretty close and especially helpful if your leaving the FailFast code in production/logging the issues.
 
 ```C#

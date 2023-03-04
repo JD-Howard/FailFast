@@ -7,8 +7,9 @@ namespace System.Diagnostics.CodeAnalysis.FailFastInternal;
 /// Note that only code using TryBreak() &amp; Throws() will generate log data.
 /// </summary>
 public interface IFailFastConfig
-{
-    public bool CanDebugBreak { get; set; }
+{   
+    public bool GetCanDebugBreak();
+    public void SetCanDebugBreak(bool authState);
     
     /// <summary>
     /// Captures the presence of a bad result regardless of whether CanDebuggerBreak=True.
@@ -17,7 +18,7 @@ public interface IFailFastConfig
     /// </summary>
     /// <param name="caller">Method that invoked TryBreak()</param>
     /// <param name="result">The last IResult produced before the TryBreak() was called</param>
-    public void FailFastBreak(string caller, Guid? groupId, string routing, IEnumerable? context);
+    public void FailFastBreak(string caller, string routing, object? context);
     
     /// <summary>
     /// Captures exception data from the Throws() method
