@@ -9,7 +9,7 @@ on:
 
 jobs:
   FF-BUILD-PIPELINE:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       CSPROJ1: ${{ github.workspace }}\FailFast\FailFast\FailFast.csproj
       CSPROJ2: ${{ github.workspace }}\FailFast\UnitTests\UnitTests.csproj
