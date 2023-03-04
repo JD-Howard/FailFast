@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>Latest</LangVersion>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Title>FailFast</Title>
+        <Nullable>enable</Nullable>
+        <Authors>JD-Howard</Authors>
+        <Description>NetStandard developer library for wrapping defensive code into something that can either be inspected or ignored depending on your needs. Also designed to be left in production builds without side effects; for most cases...</Description>
+        <PackageProjectUrl>https://github.com/JD-Howard/FailFast</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/JD-Howard/FailFast</RepositoryUrl>
+        <PackageTags>Defensive;Devleoper;Debug;Breakpoint;Logs</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+
+    <PropertyGroup Condition="$(Configuration) == 'Debug'">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+        <OutDir>bin\Debug\$(TargetFramework)</OutDir>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration) == 'Release'">
+        <Optimize>true</Optimize>
+        <DebugType>none</DebugType>
+        <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+        <OutDir>bin\Release\$(TargetFramework)</OutDir>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <None Include="..\LICENSE">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+
+
+    <Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="$(Configuration) == 'Release'">
+        <ItemGroup>
+            <PkgNew Include="$(SolutionDir)FailFast\bin\Release\*.nupkg"/>
+            <PkgOld Include="$(SolutionDir)Latest\*.nupkg"/>
+        </ItemGroup>
+
+        <Delete Files="@(PkgOld)"/>
+        <Copy SourceFiles="@(PkgNew)" DestinationFolder="$(SolutionDir)Latest\"/>
+    </Target>
+
+</Project>
