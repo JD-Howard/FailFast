@@ -12,48 +12,37 @@ public class TestThrows
         var result = 2 / by;
     }
 
-    [SetUp]
-    public void Setup()
-    {
-        // Debugger.Break() can't be unit tested, see E2ETests.ExplicitTests
-        FailFast.Initialize(SetupConfig.GetMock());
-    }
 
     [Test]
     public void WhenThrowsNoArgsExpectTrue()
     {   
-        Assert.IsTrue(FailFast.When.Throws(ThrowYes));
-        Assert.IsTrue(FailFast.When.Throws(() => ThrowMaybe(0)));
+        Assert.IsTrue(FailFast.When.Throws(ThrowYes).Result);
+        Assert.IsTrue(FailFast.When.Throws(() =>
+        {
+            ThrowYes();
+        }).Result);
     }
     
     [Test]
     public void WhenThrowsNoArgsExpectFalse()
     {   
-        Assert.IsFalse(FailFast.When.Throws(ThrowNo));
-        Assert.IsFalse(FailFast.When.Throws(() => ThrowMaybe(2)));
+        Assert.IsFalse(FailFast.When.Throws(ThrowNo).Result);
+        Assert.IsFalse(FailFast.When.Throws(() =>
+        {
+            ThrowNo();
+        }).Result);
     }
     
-    [Test]
-    public void WhenThrowsWithArgsExpectTrue()
-    {   
-        Assert.IsTrue(FailFast.When.Throws(0, ThrowMaybe));
-    }
-    
-    [Test]
-    public void WhenThrowsWithArgsExpectFalse()
-    {   
-        Assert.IsFalse(FailFast.When.Throws(2, ThrowMaybe));
-    }
         
     [Test, NonParallelizable]
     public void ThrowLogHits()
     {
-        SetupConfig.GetMock().LogCount = 0;
+        Global.LogCount = 0;
         FailFast.When.Throws(ThrowYes);
         FailFast.When.Throws(ThrowNo);
-        FailFast.When.Throws(0, ThrowMaybe);
-        FailFast.When.Throws(2, ThrowMaybe);
-        Assert.AreEqual(2, SetupConfig.GetMock().LogCount);
+        FailFast.When.Throws(() => ThrowMaybe(0));
+        FailFast.When.Throws(() => ThrowMaybe(2));
+        Assert.AreEqual(2, Global.LogCount);
     }
     
 }

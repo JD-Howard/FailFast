@@ -1,4 +1,6 @@
-﻿#if NETSTANDARD2_0
+﻿// NotNullWhenAttribute exists in NetStandard2.1 and will be injected for NetStandard2.0 builds
+
+#if NETSTANDARD2_0
 using System;
 namespace System.Diagnostics.CodeAnalysis;
 

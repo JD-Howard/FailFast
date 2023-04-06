@@ -1,0 +1,39 @@
+﻿<Window x:Class="IntegrationTests.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IntegrationTests"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="FailFast Integration Tests" 
+        Height="600" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center">
+            When this is run in Debug mode, All of these test should be capable of
+            returning to MainWindow.xaml.cs with a single StepIn or StepOut.
+        </TextBlock>
+        
+        <WrapPanel Margin="3" Grid.Row="1">
+            <Button Margin="5" Content="When.Throws()" Click="TestThrows_OnClick"/>
+            <Button Margin="5" Content="When.Null()" Click="TestNull_OnClick"/>
+            <Button Margin="5" Content="When.NotNull()" Click="TestNotNull_OnClick"/>
+            <Button Margin="5" Content="When.True()" Click="TestTrue_OnClick"/>
+            <Button Margin="5" Content="When.NotTrue()" Click="TestNotTrue_OnClick"/>
+            <Separator Width="{Binding ActualWidth}" Background="Transparent"/>
+            <Button Margin="5" Content="BreakWhen.Null()" Click="TestNull_OnClick"/>
+            <Button Margin="5" Content="BreakWhen.NotNull()" Click="TestNotNull_OnClick"/>
+            <Button Margin="5" Content="BreakWhen.True()" Click="TestTrue_OnClick"/>
+            <Button Margin="5" Content="BreakWhen.NotTrue()" Click="TestNotTrue_OnClick"/>
+        </WrapPanel>
+        
+        <TextBox Grid.Row="2" Background="Black" Foreground="White"></TextBox>
+    </Grid>
+    
+</Window>

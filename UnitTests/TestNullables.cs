@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace UnitTests
 {
     public class TestNullables
@@ -7,12 +5,6 @@ namespace UnitTests
         SetupDummy? valueStub = SetupDummy.GetInstance();
         SetupDummy? nullStub = SetupDummy.GetInstance(false);
         
-        [SetUp]
-        public void Setup()
-        {
-            // Debugger.Break() can't be unit tested, see E2ETests.ExplicitTests
-            FailFast.Initialize(SetupConfig.GetMock());
-        }
 
         [Test]
         public void WhenNullExpectTrue()
@@ -41,12 +33,12 @@ namespace UnitTests
         [Test, NonParallelizable]
         public void NullableLogHits()
         {
-            SetupConfig.GetMock().LogCount = 0;
+            Global.LogCount = 0;
             FailFast.When.Null(valueStub);
             FailFast.When.Null(nullStub);
             FailFast.When.NotNull(valueStub);
             FailFast.When.NotNull(nullStub);
-            Assert.AreEqual(2, SetupConfig.GetMock().LogCount);
+            Assert.AreEqual(2, Global.LogCount);
         }
         
         

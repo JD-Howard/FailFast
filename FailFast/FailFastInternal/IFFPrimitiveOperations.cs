@@ -3,19 +3,19 @@ using System.Runtime.CompilerServices;
 
 namespace System.Diagnostics.CodeAnalysis.FailFastInternal;
 
-public interface IFailFastOperations
+public interface IFFPrimitiveOperations
 {
     
     /// <summary>
     /// Tests if an object is null
     /// </summary>
     /// <param name="obj">The object you want to null check</param>
-    /// <param name="caller">For logging purposes and should be handled automatically</param>
+    /// <param name="caller">Only for logging purposes and should be handled automatically</param>
     /// <returns>true if the provided object is null</returns>
     bool Null([NotNullWhen(false)] object? obj, [CallerMemberName] string caller = "");
     
     
-    /// <inheritdoc cref="IFailFastOperations.Null"/>>
+    /// <inheritdoc cref="IFFPrimitiveOperations.Null"/>>
     /// <summary>
     /// Tests if an object is not null
     /// </summary>
@@ -32,7 +32,7 @@ public interface IFailFastOperations
     bool True(bool? test, [CallerMemberName] string caller = "");
     
     
-    /// <inheritdoc cref="IFailFastOperations.True"/>>
+    /// <inheritdoc cref="IFFPrimitiveOperations.True"/>>
     /// <summary>
     /// Tests if a boolean condition in your code resolved to false. 
     /// </summary>
@@ -40,16 +40,4 @@ public interface IFailFastOperations
     bool NotTrue(bool? test, [CallerMemberName] string caller = "");
     
     
-    /// <summary>
-    /// Executes a provided method/lambda in a Try/Catch and resolves to true if an exception is thrown. 
-    /// </summary>
-    /// <param name="expression">A method or lambda that does something that may throw an exception</param>
-    /// <param name="caller">For logging purposes and should be handled automatically</param>
-    /// <returns>true if the expression provided threw an exception</returns>
-    bool Throws(Action expression, [CallerMemberName] string caller = "");
-    
-    
-    /// <inheritdoc cref="IFailFastOperations.Throws(Action, string)"/>>
-    /// <param name="args">Argument(s) your expression requires for execution</param>
-    bool Throws<T>(T args, Action<T> expression, [CallerMemberName] string caller = "");
 }

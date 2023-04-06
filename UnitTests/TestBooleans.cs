@@ -2,13 +2,6 @@ namespace UnitTests
 {
     public class TestBooleans
     {
-        
-        [SetUp]
-        public void Setup()
-        {
-            // Debugger.Break() can't be unit tested, see E2ETests.ExplicitTests
-            FailFast.Initialize(SetupConfig.GetMock());
-        }
 
         [Test]
         public void WhenTrueExpectTrue()
@@ -40,12 +33,12 @@ namespace UnitTests
         [Test, NonParallelizable]
         public void BooleanLogHits()
         {
-            SetupConfig.GetMock().LogCount = 0;
+            Global.LogCount = 0;
             FailFast.When.True(true);
             FailFast.When.True(false);
             FailFast.When.NotTrue(true);
             FailFast.When.NotTrue(false);
-            Assert.AreEqual(2, SetupConfig.GetMock().LogCount);
+            Assert.AreEqual(2, Global.LogCount);
         }
         
     }
