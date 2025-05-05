@@ -37,8 +37,10 @@ jobs:
         if: steps.build-projects.outcome == 'success'
         run: |
           dotnet test "${{ env.TESTPRJ }}" --logger "console;verbosity=normal" --no-build --no-restore --configuration Debug
-      - run: |
-          if: steps.run-tests.outcome == 'success' && github.ref == 'refs/heads/main'
+      
+      - name: PostRelease
+        if: steps.run-tests.outcome == 'success' && github.ref == 'refs/heads/main'
+        run: |          
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name ${{ github.actor }}
           git add -f "${{ github.workspace }}\Release\FailFast.cs"
