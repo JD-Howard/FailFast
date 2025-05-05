@@ -13,6 +13,11 @@
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" PrivateAssets="All"/>
     </ItemGroup>
 
+    <Target Name="PrintPaths" BeforeTargets="Build">
+        <Message Text="MSBuildProjectDirectory: $(MSBuildProjectDirectory)" Importance="high" />
+        <Message Text="SolutionDir: $(SolutionDir)" Importance="high" />
+    </Target>
+
     <ItemGroup Label="The order these appear in the list will determine their insertion in CS output file">
         <FileTargs Include="$(SolutionDir)FailFast\Providers\Configure.cs" />
         <FileTargs Include="$(SolutionDir)FailFast\FailFast.cs"/>
