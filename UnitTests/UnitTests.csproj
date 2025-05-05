@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net48</TargetFrameworks>
+		<TargetFramework>net8</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>Latest</LangVersion>
 		<IsPackable>false</IsPackable>
+		<Version>$(FFVersion)</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,7 +18,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\FailFast\FailFast.csproj" />
+		<Compile Include="..\Release\FailFast.cs" />
 	</ItemGroup>
+
+	<Target Name="BuildShared" BeforeTargets="BeforeBuild">
+		<MSBuild Projects="..\FailFast\FailFast.csproj" />
+	</Target>
 
 </Project>

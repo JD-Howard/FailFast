@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <Configurations>Debug;Release;Production</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Version>$(FFVersion)</Version>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Release\FailFast.cs" />
+    </ItemGroup>
+
+    <Target Name="BuildShared" BeforeTargets="BeforeBuild">
+        <MSBuild Projects="..\FailFast\FailFast.csproj" />
+    </Target>
+
+</Project>
