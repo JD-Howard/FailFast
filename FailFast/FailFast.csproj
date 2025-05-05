@@ -13,28 +13,23 @@
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" PrivateAssets="All"/>
     </ItemGroup>
 
-    <Target Name="PrintPaths" BeforeTargets="Build">
-        <Message Text="MSBuildProjectDirectory: $(MSBuildProjectDirectory)" Importance="high" />
-        <Message Text="SolutionDir: $(SolutionDir)" Importance="high" />
-    </Target>
-
     <ItemGroup Label="The order these appear in the list will determine their insertion in CS output file">
-        <FileTargs Include="$(SolutionDir)FailFast\Providers\Configure.cs" />
-        <FileTargs Include="$(SolutionDir)FailFast\FailFast.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Providers\Operations.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Providers\ThrowRecovery.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Constants\FFBreakOption.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Constants\FFContext.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Interfaces\IPrimitiveOps.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Interfaces\IAdvancedOps.cs"/>
-        <FileTargs Include="$(SolutionDir)FailFast\Interfaces\IThrowRecovery.cs"/>        
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Providers\Configure.cs" />
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\FailFast.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Providers\Operations.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Providers\ThrowRecovery.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Constants\FFBreakOption.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Constants\FFContext.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Interfaces\IPrimitiveOps.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Interfaces\IAdvancedOps.cs"/>
+        <FileTargs Include="$(MSBuildProjectDirectory)FailFast\Interfaces\IThrowRecovery.cs"/>        
     </ItemGroup>
 
     <Target Name="RunMergeTask" AfterTargets="Build">
-        <MergeOps Header="$(SolutionDir)FailFast\Usings.cs"
+        <MergeOps Header="$(MSBuildProjectDirectory)FailFast\Usings.cs"
                   FileList="@(FileTargs)"
-                  Footer="$(SolutionDir)FailFast\IdeShim.cs"
-                  OutFile="$(SolutionDir)Release\FailFast.cs"
+                  Footer="$(MSBuildProjectDirectory)FailFast\IdeShim.cs"
+                  OutFile="$(MSBuildProjectDirectory)Release\FailFast.cs"
                   Version="$(FFVersion)"/>
     </Target>
 
