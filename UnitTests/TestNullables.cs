@@ -2,8 +2,8 @@ namespace UnitTests
 {
     public class TestNullables
     {
-        SetupDummy? valueStub = SetupDummy.GetInstance();
-        SetupDummy? nullStub = SetupDummy.GetInstance(false);
+        Stub? valueStub = Stub.GetInstance();
+        Stub? nullStub = Stub.GetInstance(false);
         
 
         [Test]
@@ -33,12 +33,12 @@ namespace UnitTests
         [Test, NonParallelizable]
         public void NullableLogHits()
         {
-            Global.LogCount = 0;
+            Setup.LogCount = 0;
             FailFast.When.Null(valueStub);
             FailFast.When.Null(nullStub);
             FailFast.When.NotNull(valueStub);
             FailFast.When.NotNull(nullStub);
-            Assert.AreEqual(2, Global.LogCount);
+            Assert.AreEqual(2, Setup.LogCount);
         }
         
         

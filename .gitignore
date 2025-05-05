@@ -5,8 +5,7 @@
 /Temp/**
 /packages/**
 
-*.DotSettings.user
-*.csproj.user
+*.user
 *.bak
 
 .DS_Store

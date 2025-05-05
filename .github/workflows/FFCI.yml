@@ -17,22 +17,34 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: .\FailFast
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Restore Dependencies
+
+# THIS IS NOT NEEDED WHEN USING A WINDOWS RUNNER
+#      - name: Setup .NET
+#        uses: actions/setup-dotnet@v3
+#        with:
+#          dotnet-version: 8.0.x
+
+      - name: Restore
         run: |
           dotnet restore "${{ env.CSPROJ1 }}"
           dotnet restore "${{ env.CSPROJ2 }}"
-      - name: Build All
-        id: build-all
+      - name: Build
+        id: build-projects
         run: |
           dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Debug
           dotnet build "${{ env.CSPROJ2 }}" --no-restore --configuration Debug
-          dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Release
+
       - name: Test
         id: run-tests
+        if: steps.build-projects.outcome == 'success'
         run: |
           dotnet test "${{ env.CSPROJ2 }}" --logger "console;verbosity=normal" --no-build --no-restore --configuration Debug
+      - run: |
+          if: steps.run-tests.outcome == 'success'
+          dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Release
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name ${{ github.actor }}
+          git add -f "${{ github.workspace }}\Release\FailFast.cs"
+          git commit -m 'GH Action Release Artifacts'
+          git push origin main
           

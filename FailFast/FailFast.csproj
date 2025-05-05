@@ -1,62 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <UsingTask TaskName="FailFast.Tasks.MergeOps" AssemblyFile="$(OutDir)$(AssemblyName).dll" />
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-        <LangVersion>latest</LangVersion>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <Title>FailFast</Title>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion Label="Compiles compatible with v8">10</LangVersion>
         <Nullable>enable</Nullable>
         <Authors>JD-Howard</Authors>
-        <Description>NetStandard developer library for wrapping defensive code into something that can either be inspected or ignored depending on your needs. Also designed to be left in production builds without side effects; for most cases...</Description>
-        <PackageProjectUrl>https://github.com/JD-Howard/FailFast</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/JD-Howard/FailFast</RepositoryUrl>
-        <PackageTags>Defensive;Devleoper;Debug;Breakpoint;Logs</PackageTags>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Version>2.0.0</Version>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
-        <DocumentationFile>bin\FailFast.xml</DocumentationFile>		
+        <Version>$(FFVersion)</Version>
     </PropertyGroup>
-
-
-    <!--<PropertyGroup Condition="$(Configuration) == 'Debug'">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-        <OutDir>bin\Debug\$(TargetFramework)</OutDir>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration) == 'Release'">
-        <Optimize>true</Optimize>
-        <DebugType>none</DebugType>
-        <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-        <OutDir>bin\Release\$(TargetFramework)</OutDir>
-    </PropertyGroup>-->
-
 
     <ItemGroup>
-        <None Include="..\LICENSE">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-        <None Include="..\README.md">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" PrivateAssets="All"/>
     </ItemGroup>
 
+    <ItemGroup Label="The order these appear in the list will determine their insertion in CS output file">
+        <FileTargs Include="$(SolutionDir)FailFast\Providers\Configure.cs" />
+        <FileTargs Include="$(SolutionDir)FailFast\FailFast.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Providers\Operations.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Providers\ThrowRecovery.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Constants\FFBreakOption.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Constants\FFContext.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Interfaces\IPrimitiveOps.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Interfaces\IAdvancedOps.cs"/>
+        <FileTargs Include="$(SolutionDir)FailFast\Interfaces\IThrowRecovery.cs"/>        
+    </ItemGroup>
 
-    <Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="$(Configuration) == 'Release'">
-        <ItemGroup>
-            <PkgNew Include="$(SolutionDir)FailFast\bin\Release\*.nupkg" />
-            <PkgOld Include="$(SolutionDir)Latest\*.nupkg" />
-			<XmlDocs Include="bin\FailFast.xml" />
-        </ItemGroup>
-
-        <Delete Files="@(PkgOld)" />
-        <Copy SourceFiles="@(PkgNew)" DestinationFolder="$(SolutionDir)Latest\" />
-		<Copy SourceFiles="@(XmlDocs)" DestinationFolder="bin\Release\netstandard2.0" />
-		<Copy SourceFiles="@(XmlDocs)" DestinationFolder="bin\Release\netstandard2.1" />
+    <Target Name="RunMergeTask" AfterTargets="Build">
+        <MergeOps Header="$(SolutionDir)FailFast\Usings.cs"
+                  FileList="@(FileTargs)"
+                  Footer="$(SolutionDir)FailFast\IdeShim.cs"
+                  OutFile="$(SolutionDir)Release\FailFast.cs"
+                  Version="$(FFVersion)"/>
     </Target>
 
 </Project>

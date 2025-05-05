@@ -37,12 +37,12 @@ public class TestThrows
     [Test, NonParallelizable]
     public void ThrowLogHits()
     {
-        Global.LogCount = 0;
+        Setup.LogCount = 0;
         FailFast.When.Throws(ThrowYes);
         FailFast.When.Throws(ThrowNo);
         FailFast.When.Throws(() => ThrowMaybe(0));
         FailFast.When.Throws(() => ThrowMaybe(2));
-        Assert.AreEqual(2, Global.LogCount);
+        Assert.AreEqual(2, Setup.LogCount);
     }
     
 }

@@ -2,45 +2,21 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net6.0-windows</TargetFramework>
+        <TargetFramework>net8-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <Configurations>Debug;Release;Production</Configurations>
         <Platforms>AnyCPU</Platforms>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <Optimize>false</Optimize>
-        <DebugType>full</DebugType>
-        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-        <OutDir>.\bin\Debug</OutDir>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <Optimize>true</Optimize>
-        <DebugType>none</DebugType>
-        <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-        <OutDir>.\bin\Release</OutDir>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)' == 'Production' ">
-        <Optimize>true</Optimize>
-        <DebugType>none</DebugType>
-        <DefineConstants>$(DefineConstants);PRODUCTION</DefineConstants>
-        <OutDir>.\bin\Production</OutDir>
+        <Version>$(FFVersion)</Version>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="FailFast">
-            <HintPath>..\FailFast\bin\Release\netstandard2.1\FailFast.dll</HintPath>
-        </Reference>
+        <Compile Include="..\Release\FailFast.cs" />
     </ItemGroup>
 
-    <Target Name="BuildBaseFirst" BeforeTargets="PrepareForBuild">
-        <MSBuild Projects="..\FailFast\FailFast.csproj" Properties="Configuration=Release;TargetFramework=netstandard2.1" />
-        <ItemGroup>
-            <XmlDocs Include="..\FailFast\bin\FailFast.xml" />
-        </ItemGroup>
-
-        <Copy SourceFiles="@(XmlDocs)" DestinationFolder="$(OutDir)" />
+    <Target Name="BuildShared" BeforeTargets="BeforeBuild">
+        <MSBuild Projects="..\FailFast\FailFast.csproj" />
     </Target>
 
 </Project>

@@ -33,12 +33,12 @@ namespace UnitTests
         [Test, NonParallelizable]
         public void BooleanLogHits()
         {
-            Global.LogCount = 0;
+            Setup.LogCount = 0;
             FailFast.When.True(true);
             FailFast.When.True(false);
             FailFast.When.NotTrue(true);
             FailFast.When.NotTrue(false);
-            Assert.AreEqual(2, Global.LogCount);
+            Assert.AreEqual(2, Setup.LogCount);
         }
         
     }
