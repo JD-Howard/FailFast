@@ -11,8 +11,8 @@ jobs:
   FF-BUILD-PIPELINE:
     runs-on: windows-latest
     env:
-      CSPROJ1: ${{ github.workspace }}\FailFast\FailFast\FailFast.csproj
-      CSPROJ2: ${{ github.workspace }}\FailFast\UnitTests\UnitTests.csproj
+      SLN: ${{ github.workspace }}\FailFast\FailFast.sln
+      TESTPRJ: ${{ github.workspace }}\FailFast\UnitTests\UnitTests.csproj
     steps:
       - uses: actions/checkout@v3
         with:
@@ -26,22 +26,19 @@ jobs:
 
       - name: Restore
         run: |
-          dotnet restore "${{ env.CSPROJ1 }}"
-          dotnet restore "${{ env.CSPROJ2 }}"
+          dotnet restore "${{ env.SLN }}"
       - name: Build
         id: build-projects
         run: |
-          dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Debug
-          dotnet build "${{ env.CSPROJ2 }}" --no-restore --configuration Debug
+          dotnet build "${{ env.SLN }}" --no-restore --configuration Debug
 
       - name: Test
         id: run-tests
         if: steps.build-projects.outcome == 'success'
         run: |
-          dotnet test "${{ env.CSPROJ2 }}" --logger "console;verbosity=normal" --no-build --no-restore --configuration Debug
+          dotnet test "${{ env.TESTPRJ }}" --logger "console;verbosity=normal" --no-build --no-restore --configuration Debug
       - run: |
-          if: steps.run-tests.outcome == 'success'
-          dotnet build "${{ env.CSPROJ1 }}" --no-restore --configuration Release
+          if: steps.run-tests.outcome == 'success' && github.ref == 'refs/heads/main'
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name ${{ github.actor }}
           git add -f "${{ github.workspace }}\Release\FailFast.cs"
