@@ -1,7 +1,7 @@
 // ============================================================================
 // Author: Joshua Howard
 // Project: FailFast
-// Version: 2.0.0.0
+// Version: 2.0.1.0
 // License: MIT License
 // Source: https://github.com/JD-Howard/FailFast
 // 
@@ -125,8 +125,10 @@ namespace System.Diagnostics
             internal delegate void FFLogThrow(string caller, ExceptionDispatchInfo error);
             
             internal static FFLogThrow? ThrowsLogHandler { get; set; } = null;
-            
-            
+
+
+            internal static void SetExceptionDbSize(int size) 
+                => FailFast.SetExceptionDbBounds(size);
         }
         
         
@@ -215,8 +217,25 @@ namespace System.Diagnostics
         }
         
         private static readonly object ExceptionDbLock = new object();
-        private static readonly ExceptionDispatchInfo[] ExceptionDb = new ExceptionDispatchInfo[100];
+        private static ExceptionDispatchInfo[] ExceptionDb = new ExceptionDispatchInfo[100];
         private static int NextIndex = 0;
+        private static int DbSize = 100;
+        private static int ResizeCount = 0; 
+
+        private static void SetExceptionDbBounds(int size)
+        {
+            lock (ExceptionDbLock)
+            {
+                if (ResizeCount++ > 0)
+                    return;
+            
+                DbSize = size < 10 ? 10 
+                    : size > 10000 ? 10000 : size;
+
+                NextIndex = 0;
+                ExceptionDb = new ExceptionDispatchInfo[DbSize];    
+            }
+        }
     
         [DebuggerHidden]
         private static int GetExceptionToken(ExceptionDispatchInfo? ex)
@@ -226,7 +245,7 @@ namespace System.Diagnostics
 
             lock (ExceptionDbLock)
             {
-                if (NextIndex >= 100)
+                if (NextIndex >= DbSize)
                     NextIndex = 0;
                 
                 var token = NextIndex++;
@@ -238,7 +257,7 @@ namespace System.Diagnostics
         [DebuggerHidden]
         private static ExceptionDispatchInfo? FindException(int token)
         {
-            if (token == -1)
+            if (token == -1 || token >= DbSize)
                 return null;
 
             lock (ExceptionDbLock)

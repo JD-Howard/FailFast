@@ -1,18 +1,21 @@
 # FailFast
-A NetStandard developer library for wrapping defensive code into something that can either be inspected, logged or ignored depending on your need/environment. A great deal of thought went into avoiding development side effects being pushed to production. In most cases, the presence of FailFast invocations should be safe for production.
+A NetStandard developer library for wrapping defensive code into something that can either be inspected, logged or ignored depending on your need/environment. A great deal of thought went into avoiding development side effects being pushed to production.
 
 ### v2.0.0 Important Note 
 FailFast was converted to a single CS file output release because the `[DebuggerHidden]` flag was not being respected by a compiled Try/Catch. There was a clunky workaround of consumers providing their own Try/Catch delegate, but a mandatory configuration element was not acceptable constraint.
 
+### v2.0.1 Note
+FailFast now supports user-configurable exception storage sizing while retaining production safety. ExceptionDb defaults to 100 entries but can be resized exactly once during startup (see Configuration).
+
 ### What does FailFast Solve?
-Make defensive code more succinct and prevent accessible `Debugger.Break()` calls being left in production code. If using `Debugger.Break()` is such a problem, then why not just use IDE breakpoint conditions? Yes, those work too, but breakpoints conditions are a compounding extreme drag on the debugger. Even minimal breakpoint condition usage will be a **minimum** of 2x slower! So, some good defensive coding with a `Debugger.Break()` often winds up getting used somewhere. Instead of fighting it, FailFast seeks to manage the problem, create logging opportunities and potentially lower the verbosity of defensive code in the process.
+Make defensive code more succinct and prevent accessible `Debugger.Break()` calls being left in production code. If using `Debugger.Break()` is such a problem, then why not just use IDE breakpoint conditions? Yes, those work too, but breakpoints conditions are an extreme compounding drag on the debugger. Even minimal breakpoint condition usage will be a **minimum** of 2x slower! So, some good defensive coding with a `Debugger.Break()` often winds up getting used somewhere. Instead of fighting it, FailFast seeks to manage the problem, create logging opportunities and potentially lower the verbosity of defensive code in the process.
 
 
 
 ### Compatibility
-FailFast will never have any non-core dependencies, is built to support NetStandard 2.0 and should generally work fine with all semi-modern Core/Framework projects. FailFast is **NOT** intended to be used as a dependency of other libraries. It should always be included in the project that is using it. Also highly recommend the FailFast class namespace is updated to match your root project namespace.
+FailFast will never have any non-core dependencies, is built to support NetStandard 2.0 and should generally work fine with all semi-modern Core/Framework projects. FailFast is **NOT** intended to be used as a dependency of other libraries. It should always be included in the project that is using it. Also **highly recommend** the FailFast class namespace is updated to match your root project namespace. This will isolate static FailFast instances from internal shared libraries that also use FailFast with `InternalsVisibleTo` declarations.
 
-Note that the `[NotNullWhen]` attribute used by FailFast Null() & NotNull() methods does not exist in legacy Frameworks. There is a compatibility shim for NetStandard2.0 (Framework) projects and Newer/Advanced IDEs like VS2022 & Rider both seem to use the shim appropriately. Directives put it out of scope automatically, but if your project has its own shim for this attribute, then delete it from the bottom of the `FailFast.cs` file.
+Note that the `[NotNullWhen]` attribute used by FailFast Null() & NotNull() methods does not exist in legacy Frameworks. There is a compatibility shim for NetStandard2.0 (Framework) projects and Newer/Advanced IDEs like VS2022 & Rider both seem to use the shim appropriately. Directives put it out of scope automatically, but if your project already has its own shim for this attribute, then delete it from the bottom of the `FailFast.cs` file.
 
 ```C#
 if (FailFast.When.Null(SomeObj))
@@ -38,6 +41,10 @@ FailFast itself is a static internal class and should be isolated from standard 
     - This is the default value if the DEBUG directive is NOT defined.
   - StaticTrue: initializes to True and **cannot** be changed if set.
     - Occasionally using this in a debug build can help you discover what FailFast might be masking.
+- **SetExceptionDbSize(int size)**
+  - Optional method for adjusting the number of exceptions FailFast temporarily stores for recovery. This can be called only once, and should be configured during startup because this resize operation will invalidate existing tokens.
+    - Default: 100
+    - Allowed Range: 10-10,000
 - **Delegate** `FFLogBreak(string caller, string routing, object? context)`
   - Optional and used by the `FailFast.Configure.BreakLogHandler` Property. This provides logging opportunities for any build configuration type and doesn't really care about `BreakBehavior` state or if a debugger is attached. If you don't want to generate logs in a debug build, then use compiler directives to only configure it on non-debug builds.
   - Argument Breakdown:
@@ -51,7 +58,16 @@ FailFast itself is a static internal class and should be isolated from standard 
     - *error:* A fully captured exception that can be logged or rethrown at a later time while maintaining the original context.
       - https://learn.microsoft.com/en-us/dotnet/standard/exceptions/best-practices-for-exceptions#capture-exceptions-to-rethrow-later
 
-**Note: You should configure/initialize FailFast very early in your application lifecycle.** Also note that FailFast being configured for NetStandard2.0 means it is unaware of the standard `ILogger` interface, and this is why you need to handle that on your end by providing delegates.
+**Note: You should configure/initialize FailFast very early in your application lifecycle.** Also note that FailFast being configured for NetStandard2.0 means it is unaware of the standard `ILogger` interface, and this is why you need to handle that on your end by providing delegates. Such as this:
+
+```C#
+// Set exception buffer size (call once, during startup!)  
+FailFast.Configure.SetExceptionDbSize(500); // Min=10, Max=10,000  
+
+// Configure logging (optional)  
+FailFast.Configure.BreakLogHandler = (caller, routing, context) =>  
+    _logger.Warn($"FailFast triggered in {caller}: {routing} ({context})");
+```
 
 
 ### Dynamic BreakBehavior Manipulation
@@ -117,6 +133,10 @@ public int UpdateMagicNumber(int seed)
 ```
 
 In that example and assuming `BreakBehavior` is init or static true... If any one of those FailFast `Throws()` calls threw an exception, then you should hit a `Debugger.Break()` and get some insight into what went wrong without losing your debug session. It should land inside of the FailFast `Debugger.Break()` giving you the ability to inspect the `ex.SourceException` and 1 Step-In/Out should get you back to your code.
+
+### Note on Performance
+FailFast is very light weight and thread safe, but the use of a locking on the ExceptionDB could create a bottleneck in highly concurrent code using `FailFast.When.Throws()` operations with lots of bugs. As a general rule, avoid the use of Throws() in any highly parallel tasks, but is probably fine in most other situations not riddled with bugs.
+
 
 ### Note on Capturing
 Capturing is bad... However, its not that bad and even native functionality (like async) will do very similar things. While `FailFast.When.Throws()` does regularly capture variables, in most cases, avoiding it would be an unnecessary micro-optimization.

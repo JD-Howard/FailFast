@@ -90,8 +90,10 @@
             internal delegate void FFLogThrow(string caller, ExceptionDispatchInfo error);
             
             internal static FFLogThrow? ThrowsLogHandler { get; set; } = null;
-            
-            
+
+
+            internal static void SetExceptionDbSize(int size) 
+                => FailFast.SetExceptionDbBounds(size);
         }
         
         

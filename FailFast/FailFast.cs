@@ -82,8 +82,25 @@
         }
         
         private static readonly object ExceptionDbLock = new object();
-        private static readonly ExceptionDispatchInfo[] ExceptionDb = new ExceptionDispatchInfo[100];
+        private static ExceptionDispatchInfo[] ExceptionDb = new ExceptionDispatchInfo[100];
         private static int NextIndex = 0;
+        private static int DbSize = 100;
+        private static int ResizeCount = 0; 
+
+        private static void SetExceptionDbBounds(int size)
+        {
+            lock (ExceptionDbLock)
+            {
+                if (ResizeCount++ > 0)
+                    return;
+            
+                DbSize = size < 10 ? 10 
+                    : size > 10000 ? 10000 : size;
+
+                NextIndex = 0;
+                ExceptionDb = new ExceptionDispatchInfo[DbSize];    
+            }
+        }
     
         [DebuggerHidden]
         private static int GetExceptionToken(ExceptionDispatchInfo? ex)
@@ -93,7 +110,7 @@
 
             lock (ExceptionDbLock)
             {
-                if (NextIndex >= 100)
+                if (NextIndex >= DbSize)
                     NextIndex = 0;
                 
                 var token = NextIndex++;
@@ -105,7 +122,7 @@
         [DebuggerHidden]
         private static ExceptionDispatchInfo? FindException(int token)
         {
-            if (token == -1)
+            if (token == -1 || token >= DbSize)
                 return null;
 
             lock (ExceptionDbLock)
